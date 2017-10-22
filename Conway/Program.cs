@@ -2,7 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
+
+/* 
+ * Notes
+ * 
+ * 1. I had fun with this, so it's a bit overwrought for what it does.
+ * 2. I believe the code is correct, except that it doesn't extend the game boundary beyond what's 
+ * initially provided.
+ * 3. Usage of internal to expose code for testing indicates the need for refactoring, I think.
+ * 4. I favored immutable constructs for the naive approach. So there are lots of inefficiencies.
+ * 5. Main will run the "tests" and then execute the program with an initial seed.
+ */
 
 namespace Conway
 {
@@ -18,13 +29,60 @@ namespace Conway
 
             // "Integration Tests"
             TestGame();
-
-            // These test cases come from the wiki
             TestBlinker();
 
-            System.Console.ReadKey();
+            Console.WriteLine("Press any key to run game.");
+            Console.ReadKey();
+
+            // https://upload.wikimedia.org/wikipedia/commons/0/07/Game_of_life_pulsar.gif
+            var seed = new Board(
+                new List<List<int>>
+                {
+                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0 },
+                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0 },
+                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0 },
+                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0 },
+                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                }
+            );
+            var th = new Thread(() => GameLoop(seed, 4));
+            th.Start();
+            Console.ReadKey();
         }
 
+        private static void GameLoop(Board seed, int fps)
+        {
+            Thread.CurrentThread.IsBackground = true;
+            var sleepTime = 1000 / fps;
+
+            var currentState = seed; 
+            while (true)
+            {
+                Console.Clear();
+                Console.Write(currentState.ToString());
+                Console.WriteLine();
+                Console.WriteLine("Press any key to stop...");
+                currentState = currentState.Tick();
+
+                Thread.Sleep(sleepTime);
+            }
+        }
+
+        /*  
+         * Test Code
+         */
         private static void TestGetCell()
         {
             var cells = new List<List<int>>
@@ -112,7 +170,7 @@ namespace Conway
         }
 
         // Comparison is only used in testing but I'm not up to speed on C#'s equality semantics
-        // and I want to be comparisons work properly.
+        // and I want to be sure that comparisons work properly.
         private static void TestBoardCompare()
         {
            var cells = new List<List<int>>
@@ -210,40 +268,40 @@ namespace Conway
             Console.WriteLine("TestGame successful");
         }
 
+        // https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life#/media/File:Game_of_life_blinker.gif
         private static void TestBlinker()
         {
             var initialState = new List<List<int>>
             {
-                new List<int>{0, 0, 0, 0, 0},
-                new List<int>{0, 0, 0, 0, 0},
-                new List<int>{0, 1, 1, 1, 0},
-                new List<int>{0, 0, 0, 0, 0},
-                new List<int>{0, 0, 0, 0, 0},
+                new List<int>{0, 0, 0},
+                new List<int>{1, 1, 1},
+                new List<int>{0, 0, 0},
             };
 
             var secondState = new List<List<int>>
             {
-                new List<int>{0, 0, 0, 0, 0},
-                new List<int>{0, 0, 1, 0, 0},
-                new List<int>{0, 0, 1, 0, 0},
-                new List<int>{0, 0, 1, 0, 0},
-                new List<int>{0, 0, 0, 0, 0},
+                new List<int>{0, 1, 0},
+                new List<int>{0, 1, 0},
+                new List<int>{0, 1, 0},
             };
 
             var initialBoard = new Board(initialState);
             var secondBoard = new Board(secondState);
 
             AssertBoardsEqual(secondBoard, initialBoard.Tick());
-            // It's periodic
+            // Test periodicity
             AssertBoardsEqual(initialBoard, initialBoard.Tick().Tick()); 
             Console.WriteLine("TestBlinker successful");
         }
 
-        private static void AssertBoardsEqual(Board b1, Board b2)
+        private static void AssertBoardsEqual(Board expected, Board actual)
         {
-            if (!b1.Compare(b2))
+            if (!expected.Compare(actual))
             {
-                throw new Exception($"Expected the state of {b1} to equal the state of {b2}");
+                Console.WriteLine(expected.ToString());
+                Console.WriteLine(actual.ToString());
+                var err = $"Expected the state of {expected.ToString()} to equal the state of {actual.ToString()}";
+                throw new Exception(err);
             }
         }
 
@@ -251,20 +309,41 @@ namespace Conway
 
     class Board 
     {
-        // Protected so that we can compare cells in the `Compare` method.
-        protected List<List<Cell>> cells;
-
         public Board(List<List<Cell>> cells)
         {
             this.cells = cells;
         }
 
+        // Returns the next board state generated from the current state.
+        public Board Tick() 
+        {
+            var newCells = cells.Select((row, y) =>
+                row.Select((cell, x) =>
+                    GetNextCellState(cell, x, y)
+                ).ToList()
+            ).ToList();
+            return new Board(newCells);
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+
+            cells.ForEach(row => {
+                row.ForEach(cell => sb.Append(cell.ToString()));
+                sb.AppendLine();
+            });
+            return sb.ToString();
+        }
+
+        // Protected so that we can compare cells in the `Compare` method.
+        protected List<List<Cell>> cells;
+
         // For ease of creating a board in tests, convert a 2-dimensional list of ints into Cells, 
         // where 0 = alive and 1 = dead. 
         // In real code I would probably provide more robust helpers for creating a board.
         // This method is unsafe as it attempts to cast an integer to an enum, but does nothing
-        // to validate that the integer is in range, so it's marked internal, but I'm not sure if this is a good 
-        // practice.
+        // to validate that the integer is in range, so it's marked internal        
         internal Board(List<List<int>> cells)
         {
             this.cells = cells.Select(row =>
@@ -272,7 +351,8 @@ namespace Conway
             ).ToList();
         }
 
-        public Cell GetCellAt(int x, int y)
+        // Get cell at point.
+        internal Cell GetCellAt(int x, int y)
         {
             // Cells outside boundary are assumed to be dead.
             if (x < 0 || y < 0) { return new Cell(CellState.Dead); }
@@ -284,7 +364,8 @@ namespace Conway
             return cells[y][x];
         }
 
-        public int GetLivingNeighbourCountAt(int x, int y)
+        // Get number of living neighbours at point.
+        internal int GetLivingNeighbourCountAt(int x, int y)
         {
             var neighbours =
                 from rx in Enumerable.Range(-1, 3)
@@ -293,20 +374,10 @@ namespace Conway
                 where !(rx == 0 && ry == 0)
                 // We cast the CellState to an int (dead = 0, alive = 1), and then sum the list.
                 select (int)GetCellAt(rx + x, ry + y).State;
+
             return neighbours.Sum();
         }
         
-        // Returns a new board generated from the current state.
-        public Board Tick() 
-        {
-            var newCells = cells.Select((row, y) =>
-                row.Select((cell, x) =>
-                    GetNextCellState(cell, x, y)
-                ).ToList()
-            ).ToList();
-            return new Board(newCells);
-        }
-
         private Cell GetNextCellState(Cell cell, int x, int y)
         {
             var n = GetLivingNeighbourCountAt(x, y);
@@ -314,7 +385,7 @@ namespace Conway
             return new Cell(nextState);
         }
 
-        // Very slow, but only used in tests. Once again I'm unsure about the usage of internal.
+        // Used in tests to compared boards by gamestate. There's likely a better way to do this.
         internal Boolean Compare(Board other)
         {
             if (this.cells.Count() != other.cells.Count()) { return false;  }
@@ -359,17 +430,26 @@ namespace Conway
         }
     }
 
-    enum CellState {
+    public enum CellState {
         Dead = 0,
         Alive = 1
     };
 
-    struct Cell 
+    public class Cell 
     {
         public CellState State { get; }
         public Cell(CellState state)
         {
             State = state; 
+        }
+
+        public override string ToString()
+        {
+            if (State == CellState.Dead)
+            {
+                return " ";
+            }
+            return "X";
         }
     };
 }
