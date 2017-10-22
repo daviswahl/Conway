@@ -28,7 +28,7 @@ namespace Conway
             TestGameLogic();
 
             // "Integration Tests"
-            TestGame();
+            TestSquare();
             TestBlinker();
 
             Console.WriteLine("Press any key to run game.");
@@ -236,7 +236,7 @@ namespace Conway
             };
         }
 
-        private static void TestGame()
+        private static void TestSquare()
         {
             var initialState = new List<List<int>>
             {
@@ -317,11 +317,15 @@ namespace Conway
         // Returns the next board state generated from the current state.
         public Board Tick() 
         {
-            var newCells = cells.Select((row, y) =>
-                row.Select((cell, x) =>
-                    GetNextCellState(cell, x, y)
-                ).ToList()
-            ).ToList();
+            var newCells = cells.Select((row, y) => {
+                return row.Select((cell, x) =>
+                {
+                    var n = GetLivingNeighbourCountAt(x, y);
+                    var nextState = GameLogic.NextCellState(cell.State, n);
+                    return new Cell(nextState);
+                }).ToList();
+            }).ToList();
+
             return new Board(newCells);
         }
 
@@ -378,13 +382,6 @@ namespace Conway
             return neighbours.Sum();
         }
         
-        private Cell GetNextCellState(Cell cell, int x, int y)
-        {
-            var n = GetLivingNeighbourCountAt(x, y);
-            var nextState = GameLogic.NextCellState(cell.State, n);
-            return new Cell(nextState);
-        }
-
         // Used in tests to compared boards by gamestate. There's likely a better way to do this.
         internal Boolean Compare(Board other)
         {
