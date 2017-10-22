@@ -35,29 +35,38 @@ namespace Conway
             Console.ReadKey();
 
             // https://upload.wikimedia.org/wikipedia/commons/0/07/Game_of_life_pulsar.gif
-            var seed = new Board(
+            var pulsar = new Board(
                 new List<List<int>>
                 {
-                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                    new List<int> { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
-                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0 },
-                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0 },
-                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0 },
-                    new List<int> { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
-                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                    new List<int> { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
-                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0 },
-                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0 },
-                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0 },
-                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                    new List<int> { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
-                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 },
+                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 },
+                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 },
+                    new List<int> { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0 },
+                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 },
+                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 },
+                    new List<int> { 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 },
+                    new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    new List<int> { 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0 },
                 }
             );
-            var th = new Thread(() => GameLoop(seed, 4));
+
+            var glider = new Board(
+                new List<List<int>>
+                {
+                    new List<int>{ 0, 0, 0, 0, 0},
+                    new List<int>{ 0, 0, 1, 0, 0},
+                    new List<int>{ 0, 0, 0, 1, 0},
+                    new List<int>{ 0, 1, 1, 1, 0},
+                    new List<int>{ 0, 0, 0, 0, 0},
+                }
+                );
+            var th = new Thread(() => GameLoop(glider, 4));
             th.Start();
             Console.ReadKey();
         }
@@ -317,15 +326,17 @@ namespace Conway
         // Returns the next board state generated from the current state.
         public Board Tick() 
         {
+            if (WidthNeedsExtension()) { ExtendWidth(); }
+            if (HeightNeedsExtension()) { ExtendHeight(); }
             var newCells = cells.Select((row, y) => {
                 return row.Select((cell, x) =>
                 {
                     var n = GetLivingNeighbourCountAt(x, y);
                     var nextState = GameLogic.NextCellState(cell.State, n);
+
                     return new Cell(nextState);
                 }).ToList();
             }).ToList();
-
             return new Board(newCells);
         }
 
@@ -355,6 +366,51 @@ namespace Conway
             ).ToList();
         }
 
+        private bool WidthNeedsExtension()
+        {
+            var lastCol = this.cells.Select(row => row.LastOrDefault());
+            return Board.Has3ConsecutiveAlive(lastCol.ToList());
+        }
+
+        private bool HeightNeedsExtension()
+        {
+            return Board.Has3ConsecutiveAlive(this.cells.LastOrDefault());
+        }
+
+        private static bool Has3ConsecutiveAlive(List<Cell> cells)
+        {
+            var maxConsecutive = 0;
+            foreach(var cell in cells)
+            {
+                if (cell.State == CellState.Alive)
+                {
+                    maxConsecutive++;
+                    if (maxConsecutive == 3)
+                    {
+                        return true;
+                    }
+                } else
+                {
+                    maxConsecutive = 0;
+                }
+                
+            }
+            return false;
+        }
+        private void ExtendWidth()
+        {
+            cells = cells.Select(row => {
+                row.Add(new Cell(CellState.Dead));
+                return row;
+            }).ToList();
+        }
+
+        private void ExtendHeight()
+        {
+            var width = cells.FirstOrDefault().Count();
+
+            cells.Add(Enumerable.Repeat(new Cell(CellState.Dead), width).ToList());
+        }
         // Get cell at point.
         internal Cell GetCellAt(int x, int y)
         {
