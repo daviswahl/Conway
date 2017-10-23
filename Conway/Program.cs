@@ -344,7 +344,7 @@ namespace Conway
         protected List<List<Cell>> cells;
 
         // For ease of creating a board in tests, convert a 2-dimensional list of ints into Cells, 
-        // where 0 = alive and 1 = dead. 
+        // where 0 = dead and 1 = alive. 
         // In real code I would probably provide more robust helpers for creating a board.
         // This method is unsafe as it attempts to cast an integer to an enum, but does nothing
         // to validate that the integer is in range, so it's marked internal        
